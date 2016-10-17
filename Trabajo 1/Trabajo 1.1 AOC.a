@@ -1,0 +1,37 @@
+.data
+
+F: .word 45
+G: .word 10 24 55 67 89 90 110
+H: .space 100
+	
+					#$s0 para f,$s1 para G,$s2 para H,$s3 y $s4 para direcciones de memoria,$s6 y $s7 para controlar el bucle,$t0 la direccion de G
+					
+.text	
+.globl __start
+__start: 
+addi $s7,$zero,7
+addi $s6,$zero,0
+lui $s3,0x1001
+ori $s3,$s3,0x0000
+lw $s0,0($s3)
+lui $s4,0x1001
+ori $s4,$s4,0x0004
+loop:
+
+beq $s7,$s6,salida
+lw $s1,0($s4)
+add $s2,$s1,$s0
+sw $s2,H
+addi $s7,$s7,-1
+addi $s4,$s4,4
+add $a0,$zero,$s2
+lui $2,0x0000
+ori $2,$2,0x0001
+syscall
+j loop
+	
+salida:
+
+lui $2, 0x0000
+ori $2,$2,0x0010
+syscall
