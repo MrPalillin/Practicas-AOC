@@ -1,0 +1,57 @@
+.data
+
+Pregunta:	.ascii "Escriba el número en decimal:"
+dato:	.space 32
+Respuesta:	.ascii "El número introducido es:"
+Salto:	.asciiz"\n"
+
+.text
+.globl __start				#$t0:número
+__start:
+la $a0,Pregunta
+li $v0 4
+syscall
+addi $a1,$zero,50
+li $v0 8
+syscall
+add $s0,$zero,$a0
+la $a0,Salto
+li $v0 11
+syscall
+jal Funcion
+
+Funcion:
+addi $t2,$zero,1
+j Bucle
+
+Bucle:
+lb $t0,0($s0)
+beq $t0,$zero,Imprimir
+beq $t0,10,Imprimir
+beq $t0,45,Negativo
+addi $t0,$t0,-48
+add $t1,$t1,$t0
+mul $t1,$t1,10
+addi $s0,$s0,1
+j Bucle
+jr $ra
+
+Imprimir:
+div $t1,$t1,10
+mul $t1,$t1,$t2
+la $a0,Respuesta
+li $v0 4
+syscall
+add $a0,$zero,$t1
+li $v0 1
+syscall
+j Fin
+
+Negativo:
+addi $t2,$zero,-1
+addi $s0,$s0,1
+j Bucle
+
+Fin:
+li $v0 10
+syscall

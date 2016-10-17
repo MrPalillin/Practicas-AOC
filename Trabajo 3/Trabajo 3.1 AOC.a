@@ -1,0 +1,37 @@
+.data
+
+espacio:	.space 10
+
+.text
+.globl __start
+
+__start:					#$s7=uno(letra),$s5=contador,$s1=numero con mascara,$s2=valor original,$s0=Mascara
+li $a0,01000001		#65 en decimal
+la $a1,espacio
+add $s2,$zero,$a0
+addi $s0,$zero,0x00000000F			#Mascara 0xF0000000
+addi $s5,$zero,8
+addi $s7,$zero,1
+
+j Cambio
+
+Cambio:
+beq $s5,$zero,Fin		#Si lee todos termina
+and $s1,$s2,$s0			#Compara con mascara
+ble $s1,9,Numero
+addi $s5,$s5,-1			#Decrece el contador
+j Letra
+
+Numero:
+add $s1,$s1,48
+sll $s0,$s0,2
+j Cambio
+
+Letra:
+add $s1,$s1,55
+sll $s0,$s0,2
+j Cambio
+
+Fin:
+li $v0 10
+syscall

@@ -1,0 +1,91 @@
+.data
+pregunta:	.asciiz "Escriba el numero en decimal"
+espacio:	.space 10
+salto:		.ascii "\n"
+
+.text
+.globl __start
+
+__start:					#$s5=contador,$s1=numero con mascara,$s3=uno o cero(numero o letra),$s2=valor original,$s0=Mascara
+li $v0 5
+syscall
+addi $t0,$zero,16
+mul $v0,$v0,$t0
+la $a1,espacio
+add $s2,$zero,$v0
+addi $s0,$zero,0xF0000000			#Mascara 0xF0000000
+addi $s5,$zero,8
+
+j Cambio
+
+Cambio:
+and $s1,$s2,$s0			#Compara con mascara
+beq $s5,$zero,Fin		#Si lee todos termina
+addi $s5,$s5,-1			#Decrece el contador
+ble $s1,9,Numero
+beq $s1,10,A
+beq $s1,11,B
+beq $s1,12,C
+beq $s1,13,D
+beq $s1,14,E
+beq $s1,15,F
+
+Numero:
+add $s1,$s1,48
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+A:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+B:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+C:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+D:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+E:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+F:
+add $s1,$s1,55
+add $a0,$zero,$s1
+li $v0 11
+syscall
+srl $s0,$s0,4
+j Cambio
+
+Fin:
+li $v0 10
+syscall

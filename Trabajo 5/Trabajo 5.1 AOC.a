@@ -1,0 +1,29 @@
+.data
+
+dato:	.ascii "2"
+
+.text
+.globl __start				#$t0:número
+__start:
+la $a0,dato
+jal Funcion
+
+Funcion:
+j Bucle
+Bucle:
+
+lb $t0,0($a0)
+beq $t0,$zero,Fin
+addi $t0,$t0,-48
+add $t1,$t1,$t0
+mul $t1,$t1,10
+addi $a0,$a0,1
+j Bucle
+jr $ra
+
+Fin:
+div $t1,$t1,10
+add $v0,$zero,$t1
+add $s0,$zero,$v0
+li $v0 10
+syscall

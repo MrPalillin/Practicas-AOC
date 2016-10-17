@@ -1,0 +1,41 @@
+.data
+
+Fila1:	.byte -11 12 -13 14
+Fila2:	.byte -21 22 -23 24
+Fila3:	.byte -31 32 -33 34
+Fila4:	.byte -41 42 -43 44
+
+.text
+.globl __start
+__start:
+
+la $t0,Fila1
+la $t1,Fila2
+la $t2,Fila3
+la $t3,Fila4
+addi $s7,$zero,4
+
+Bucle:
+
+beq $s7,$zero,Resultado
+lb $s0,0($t0)
+lb $s1,0($t1)
+lb $s2,0($t2)
+lb $s3,0($t3)
+add $s4,$s4,$s0
+add $s4,$s4,$s1
+add $s4,$s4,$s2
+add $s4,$s4,$s3
+addi $t0,$t0,4
+addi $t1,$t1,4
+addi $t2,$t2,4
+addi $t3,$t3,4
+addi $s7,$s7,-1
+j Bucle
+
+Resultado:
+add $a0,$zero,$s4
+li $v0 1
+syscall
+li $v0 10
+syscall

@@ -1,0 +1,105 @@
+.data
+
+Codigo0:	.asciiz "0:Todo correcto\n"
+Codigo1:	.asciiz "1:Cadena demasiado larga\n"
+Codigo2:	.asciiz "2:Carácter incorrecto\n"
+Pregunta:	.ascii "Escriba los números en decimal:"
+dato1:	.space 32
+dato2:	.space 32
+Respuesta:	.ascii "La suma de ambos números es:"
+Salto:	.asciiz "\n"
+
+.text
+.globl __start				#$t0:número
+__start:
+la $a0,Pregunta
+li $v0 4
+syscall
+addi $a1,$zero,50
+li $v0 8
+syscall
+add $s0,$zero,$a0
+li $v0 8
+syscall
+add $s1,$zero,$a0
+la $a0,Salto
+li $v0 11
+syscall
+jal Funcion
+
+Funcion:
+addi $t2,$zero,1
+addi $t5,$zero,1
+addi $t4,$zero,58
+j Bucle1
+
+Bucle1:
+lb $t0,0($s0)
+beq $t0,$zero,Bucle2
+beq $t0,10,Bucle2
+beq $t0,45,Negativo1
+beq $t0,47,Error2
+beq $t4,$t0,Error2
+addi $t0,$t0,-48
+add $t1,$t1,$t0
+mul $t1,$t1,10
+addi $s0,$s0,1
+j Bucle1
+jr $ra
+
+Bucle2:
+lb $t7,0($s1)
+beq $t7,$zero,Imprimir
+beq $t7,10,Imprimir
+beq $t7,45,Negativo2
+beq $t0,47,Error2
+beq $t4,$t0,Error2
+addi $t7,$t7,-48
+add $t6,$t6,$t7
+mul $t6,$t6,10
+addi $s1,$s1,1
+j Bucle2
+jr $ra
+
+Imprimir:
+div $t1,$t1,10
+div $t6,$t6,10
+mul $t1,$t1,$t2
+mul $t6,$t6,$t5
+la $a0,Respuesta
+li $v0 4
+syscall
+add $a0,$t1,$t6
+li $v0 1
+syscall
+la $a0,Salto
+li $v0 4
+syscall
+la $a0,Codigo0
+li $v0 4
+syscall
+j Fin
+
+Negativo1:
+addi $t2,$zero,-1
+addi $s0,$s0,1
+j Bucle1
+
+Negativo2:
+addi $t5,$zero,-1
+addi $s1,$s1,1
+j Bucle2
+
+Error2:
+la $a0,Salto
+li $v0 4
+syscall
+li $v0 4
+la $a0,Codigo2
+syscall
+li $v0 10
+syscall
+
+Fin:
+li $v0 10
+syscall

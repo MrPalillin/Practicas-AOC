@@ -1,0 +1,28 @@
+.data
+
+Prueba:	.float 5.11111111
+Prueba2:	.double 6.222222222222222222
+LE: .asciiz "Es little-endian"
+BE: .asciiz "Es big-endian"
+
+.text
+.globl __start
+__start:
+la $t0,Prueba
+lwc1 $f0,0($t0)
+la $t1,Prueba2
+ldc1 $f2,0($t1)
+bne $t0,$zero,Little
+la $a0,BE
+li $v0 4
+syscall
+li $v0 10
+syscall
+
+Little:
+
+la $a0,LE
+li $v0 4
+syscall
+li $v0 10
+syscall

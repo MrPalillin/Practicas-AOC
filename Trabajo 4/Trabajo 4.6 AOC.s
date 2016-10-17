@@ -1,0 +1,70 @@
+.data
+
+dato:	.space 32
+salto:	.asciiz "\n"
+
+.text
+.globl __start
+__start:
+la $a0,dato
+addi $a1,$zero,50
+li $v0 8
+syscall
+li $v0 0
+addi $s0,$zero,8	#Letras en mayuscula
+jal Función
+
+Función:
+j Binario
+
+Binario:
+lb $s1,0($a0)
+slti $t2,$s1,48
+slti $t3,$s1,71
+slti $s2,$s1,58
+beq $t2,1,ErrorCaracter
+beq $t3,0,ErrorCaracter
+beq $s2,1,Numero
+beq $s2,0,Letra
+
+Numero:
+addi $s1,$s1,-48
+or $v0,$s1,$v0
+addi $s0,$s0,-1
+beq $s0,0,Fin
+rol $v0,$v0,4
+addi $a0,$a0,1
+jr $ra
+
+Letra:
+addi $s1,$s1,-55
+or $v0,$s1,$v0
+addi $s0,$s0,-1
+beq $s0,0,Fin
+rol $v0,$v0,4
+addi $a0,$a0,1
+jr $ra
+
+Fin:
+addi $t0,$zero,-1
+mul $v0,$v0,$t0
+add $a0,$zero,$v0
+li $v0 34
+syscall
+
+la $t0,salto
+lw $a0,0($t0)
+li $v0 11
+syscall
+addi $a0,$zero,0
+li $v0 1
+syscall
+li $v0 10
+syscall
+
+ErrorCaracter:
+addi $a0,$zero,2
+li $v0 1
+syscall
+li $v0 10
+syscall
