@@ -1,0 +1,81 @@
+.data
+
+Pregunta:	.asciiz "Escriba un numero: \n"
+dato:		.space	32
+Respuesta:	.asciiz	"El numero en hexadecimal es: "
+
+.text
+.globl __start
+__start:
+
+la $a0,Pregunta
+li $v0 4
+syscall
+la $a0 dato
+li $a1 50
+li $v0 8
+syscall
+add $s0,$zero,$a0
+jal CadenaANumero
+
+Fin:
+li $v0 10
+syscall
+
+CadenaANumero:
+addi $t2,$zero,1
+j Bucle1
+
+	Bucle1:
+	lb $t0,0($s0)
+	beq $t0,$zero,Paso1
+	beq $t0,10,Paso1
+	beq $t0,45,Negativo
+	addi $t0,$t0,-48
+	add $t1,$t1,$t0
+	mul $t1,$t1,10
+	addi $s0,$s0,1
+	addi $s1,$s1,1
+	j Bucle1
+
+
+	Paso1:
+	div $t1,$t1,10
+	mul $t1,$t1,$t2			#Numero en $t1	longitud en $s1
+	jal NumeroAHex
+
+	Negativo:
+	addi $t2,$zero,-1
+	addi $s0,$s0,1
+	j Bucle1
+      
+jr $ra
+
+NumeroAHex:
+addi $s1,$zero,8
+add $s2,$zero,0X0000000F
+j Bucle2
+
+	Bucle2:
+	beqz $s1,Fin
+	and $t3,$t1,$s2
+	ble $t3,10,Numero
+	j Letra
+
+	Letra:
+	add $a0,$t3,55
+	add $t4,$t4,$t3
+	li $v0 11
+	syscall
+	sll $s2,$s2,4
+	addi $s1,$s1,-1
+	j Bucle2
+
+	Numero:
+	add $a0,$t3,48
+	add $t4,$t4,$t3
+	li $v0 11
+	syscall
+	sll $s2,$s2,4
+	addi $s1,$s1,-1
+	j Bucle2

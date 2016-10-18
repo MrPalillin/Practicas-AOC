@@ -1,0 +1,42 @@
+.data
+
+Numero:		.word -12345
+Resultado:	.space 100
+
+.text
+.globl __start
+__start:
+				#$s0:Numero original	$s1:Resultado final	$t0:Direccion del numero	$t1:Cifra	$t2:Multiplicador	$t7:10(division)
+la $t0,Numero
+la $a1,Resultado
+
+jal Funcion
+
+Fin:
+li $v0 10
+syscall
+
+Funcion:
+lw $a0,0($t0)
+addi $t7,$zero,10
+ble $a0,$zero,Negativo
+
+j Dividir
+
+Negativo:
+li $t1,45
+mul $a0,$a0,-1
+sb $t1,0($a1)
+addi $a1,$a1,-1
+
+Dividir:
+beqz $a0,Fin
+div $a0,$t7
+mfhi $t1
+mflo $a0
+addi $t1,$t1,48
+sb $t1,0($a1)
+addi $a1,$a1,-1
+j Dividir
+jr $ra
+
