@@ -53,29 +53,25 @@ jr $ra
 
 NumeroAHex:
 addi $s1,$zero,8
-add $s2,$zero,0X0000000F
+add $s2,$zero,0XF0000000
 j Bucle2
 
 	Bucle2:
 	beqz $s1,Fin
 	and $t3,$t1,$s2
 	ble $t3,10,Numero
-	j Letra
 
-	Letra:
 	add $a0,$t3,55
-	add $t4,$t4,$t3
 	li $v0 11
 	syscall
-	sll $s2,$s2,4
+	srl $s2,$s2,4
 	addi $s1,$s1,-1
 	j Bucle2
 
 	Numero:
 	add $a0,$t3,48
-	add $t4,$t4,$t3
 	li $v0 11
 	syscall
-	sll $s2,$s2,4
+	srl $s2,$s2,4
 	addi $s1,$s1,-1
 	j Bucle2

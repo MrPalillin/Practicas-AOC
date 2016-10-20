@@ -1,6 +1,6 @@
 .data
 
-Numero:		.word -12345
+Numero:		.word -5001
 Resultado:	.space 100
 
 .text
