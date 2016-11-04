@@ -27,7 +27,7 @@ Diciembre:	.asciiz	"Diciembre"
 
 EDia:	.asciiz "Error, ese día es incorrecto \n"
 EMes:	.asciiz "Error,ese mes es incorrecto \n"
-EAño:	.asciiz "Error,ese año es negativo \n"
+Eyear:	.asciiz "Error,ese year es negativo \n"
 
 Dato:		.space 32
 
@@ -59,8 +59,8 @@ li $v0 4
 syscall
 j Fin
 
-ErrorAño:
-la $a0,EAño
+Erroryear:
+la $a0,Eyear
 li $v0 4
 syscall
 j Fin
@@ -87,7 +87,7 @@ j Fin
 	
 	Mes:
 	lb $t0,0($s0)			#$s0 Mes caracter a caracter
-	beq $t0,47,PasoAño
+	beq $t0,47,Pasoyear
 	addi $t0,$t0,-48
 	blt $t0,0,ErrorMes
 	bge $t0,10,ErrorMes
@@ -96,23 +96,23 @@ j Fin
 	addi $s0,$s0,1
 	j Mes
 	
-	PasoAño:
+	Pasoyear:
 	div $s2,$t1,10			#$s2 Mes aparte
 	add $t1,$zero,$zero
 	addi $s0,$s0,1
 	
-	Año:
-	lb $t0,0($s0)			#$s0 Año caracter a caracter
+	year:
+	lb $t0,0($s0)			#$s0 year caracter a caracter
 	beq $t0,10,Paso1
 	addi $t0,$t0,-48
-	blt $t0,0,ErrorAño
+	blt $t0,0,Erroryear
 	add $t1,$t1,$t0
-	mul $t1,$t1,10			#$t1 Año
+	mul $t1,$t1,10			#$t1 year
 	addi $s0,$s0,1
-	j Año
+	j year
 
 Paso1:
-div $s3,$t1,10				#$s3 Año aparte
+div $s3,$t1,10				#$s3 year aparte
 add $t1,$zero,$zero
 jal ValidarFecha
 	
@@ -166,72 +166,97 @@ jal DiaSemana
 	
 	Resta4:
 	li $t0,-4
-	j AñoSemana
+	j yearSemana
 	
 	Resta2:
-	li $v0,-2
-	j AñoSemana
+	li $t0,-2
+	j yearSemana
 	
 	Cero:
-	li $v0,0
-	j AñoSemana
+	li $t0,0
+	j yearSemana
 	
 	Suma1:
-	li $v0,1
-	j AñoSemana
+	li $t0,1
+	j yearSemana
 	
 	Suma3:
-	li $v0,3
-	j AñoSemana			#A en $t0
+	li $t0,3
+	j yearSemana			#A en $t0
 	
-	AñoSemana:			#Paso 2:Año
+	yearSemana:			#Paso 2:year
 	li $t6,100
 	div $s3,$t6
 	mfhi $t1
 	li $t6,4
 	div $t1,$t6
-	mfhi $t2
+	mflo $t2
 	add $t1,$t1,$t2		#B en $t1
+	li $t2,0
 	
 	li $t6,100
-	div $s3,$t6		#Paso 3:Bisiesto(enero y febreero)
-	mfhi $t2
-	beqz $t2,MesSemana
+	div $s3,$t6		#Paso 3:Bisiesto(enero y febrero)
+	mfhi $t7
+	beqz $t7,MesSemana
 	li $t6,4
 	div $s3,$t6
-	mfhi $t3
-	seq $t7,$t3,$zero
-	bne $t3,$zero,MesSemana
-	ble $s2,3,MesSemana
+	mfhi $t7
+	bne $t7,$zero,MesSemana
+	bgt $s2,2,MesSemana
 	li $t2,-1		#C en $t2
 	
 	MesSemana:			#Paso 4:Mes
-	li $t3,0
-	seq $t3,$s2,1
-	mul $t3,$t3,6
-	seq $t3,$s2,1
-	mul $t3,$t3,2
-	seq $t3,$s2,1
-	mul $t3,$t3,2
-	seq $t3,$s2,1
-	mul $t3,$t3,5
-	seq $t3,$s2,1
-	mul $t3,$t3,0
-	seq $t3,$s2,1
-	mul $t3,$t3,3
-	seq $t3,$s2,1
-	mul $t3,$t3,5
-	seq $t3,$s2,1
-	mul $t3,$t3,1
-	seq $t3,$s2,1
-	mul $t3,$t3,4
-	seq $t3,$s2,1
-	mul $t3,$t3,6
-	seq $t3,$s2,1
-	mul $t3,$t3,2
-	seq $t3,$s2,1
-	mul $t3,$t3,4		#Mes en $t3
+	li $t3,-1
 	
+	seq $t3,$s2,1
+	mul $t3,$t3,6
+	beq $t3,6,ResultadoMes
+	
+	seq $t3,$s2,2
+	mul $t3,$t3,2
+	beq $t3,2,ResultadoMes
+	
+	seq $t3,$s2,3
+	mul $t3,$t3,2
+	beq $t3,2,ResultadoMes
+	
+	seq $t3,$s2,4
+	mul $t3,$t3,5
+	beq $t3,5,ResultadoMes
+	
+	beq $s2,5,MesMayo			#Debido a que aqui el $t2 debe dar cero,el procedimiento en mayo es un poco diferente
+	
+	seq $t3,$s2,6
+	mul $t3,$t3,3
+	beq $t3,3,ResultadoMes
+	
+	seq $t3,$s2,7
+	mul $t3,$t3,5
+	beq $t3,5,ResultadoMes
+	
+	seq $t3,$s2,8
+	mul $t3,$t3,1
+	beq $t3,1,ResultadoMes
+	
+	seq $t3,$s2,9
+	mul $t3,$t3,4
+	beq $t3,4,ResultadoMes
+	
+	seq $t3,$s2,10
+	mul $t3,$t3,6
+	beq $t3,6,ResultadoMes
+	
+	seq $t3,$s2,11
+	mul $t3,$t3,2
+	beq $t3,2,ResultadoMes
+	
+	seq $t3,$s2,12
+	mul $t3,$t3,4		#Mes en $t3
+	j ResultadoMes
+	MesMayo:
+	li $t3,0
+	
+	ResultadoMes:		#Paso 5:Dia
 	add $t4,$t4,$s1		#Dia en $t4
 
 	add $s4,$zero,$t0
@@ -247,6 +272,7 @@ jal DiaSemana
 	Resta7:
 	addi $s4,$s4,-7
 	bge $s4,7,Resta7
+	blt $s4,7,Paso3
 	
 	jr $ra
 	
@@ -336,66 +362,111 @@ jal Imprimir
 	la $a0,Enero
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeFebrero:
 	la $a0,Febrero
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeMarzo:
 	la $a0,Marzo
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeAbril:
 	la $a0,Abril
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeMayo:
 	la $a0,Mayo
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeJunio:
 	la $a0,Junio
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeJulio:
 	la $a0,Julio
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeAgosto:
 	la $a0,Agosto
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeSeptiembre:
 	la $a0,Septiembre
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeOctubre:
 	la $a0,Octubre
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeNoviembre:
 	la $a0,Noviembre
 	li $v0,4
 	syscall
+	la $a0,De
+	li $v0 4
+	syscall
+	j Imprimeyear
 	
 	ImprimeDiciembre:
 	la $a0,Diciembre
 	li $v0,4
 	syscall
-	
 	la $a0,De
 	li $v0 4
 	syscall
+	j Imprimeyear
 	
+	Imprimeyear:
 	add $a0,$zero,$s3
 	li $v0 1
 	syscall
