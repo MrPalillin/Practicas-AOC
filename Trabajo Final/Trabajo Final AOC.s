@@ -1,3 +1,6 @@
+#Daniel de Vicente Garrote(dandevi)
+#Daniel Crespo Martinez(dancres)
+
 .data
 
 Pregunta:	.asciiz "Escriba la fecha en la que calcular: \n"
@@ -90,48 +93,47 @@ j Fin
 
 
 	CadenaAFecha:
-	add $s0,$zero,$a0
 	
 	Dia:
-	lb $t0,0($s0)			#$t0 Dia caracter a caracter
+	lb $t0,0($a0)			#$t0 Dia caracter a caracter
 	beq $t0,47,PasoMes
 	addi $t0,$t0,-48
 	blt $t0,0,ErrorDia
 	bge $t0,10,ErrorDia
 	mul $t1,$t1,10
 	add $t1,$t1,$t0			#$t1 Dia
-	addi $s0,$s0,1
+	addi $a0,$a0,1
 	j Dia
 	
 	PasoMes:
 	add $s1,$zero,$t1		#$s1 Dia aparte
 	add $t1,$zero,$zero
-	addi $s0,$s0,1
+	addi $a0,$a0,1
 	
 	Mes:
-	lb $t0,0($s0)			#$s0 Mes caracter a caracter
+	lb $t0,0($a0)			#$s0 Mes caracter a caracter
 	beq $t0,47,Pasoyear
 	addi $t0,$t0,-48
 	blt $t0,0,ErrorMes
 	bge $t0,10,ErrorMes
 	mul $t1,$t1,10
 	add $t1,$t1,$t0			#$t1 Mes
-	addi $s0,$s0,1
+	addi $a0,$a0,1
 	j Mes
 	
 	Pasoyear:
 	add $s2,$zero,$t1		#$s2 Mes aparte
 	add $t1,$zero,$zero
-	addi $s0,$s0,1
+	addi $a0,$a0,1
 	
 	year:
-	lb $t0,0($s0)			#$s0 year caracter a caracter
+	lb $t0,0($a0)			#$s0 year caracter a caracter
 	beq $t0,10,Paso1
 	addi $t0,$t0,-48
 	blt $t0,0,Erroryear
 	mul $t1,$t1,10
 	add $t1,$t1,$t0			#$t1 year
-	addi $s0,$s0,1
+	addi $a0,$a0,1
 	j year
 
 Paso1:
@@ -143,6 +145,8 @@ jal ValidarFecha
 	
 	ValidarFecha:
 	addi $t0,$zero,4
+	bgt $s2,12,ErrorMes
+	blt $s2,1,ErrorMes
 	div $s3,$t0
 	mfhi $t0			#$t0 Comprueba si es bisiesto		"1,3,5,7,8,10,12"=31	"4,6,9,11"=30	Febrero=29 o 28 si es bisiesto
 	beq $s2,1,Valida31
@@ -282,12 +286,13 @@ jal DiaSemana
 	ResultadoMes:		#Paso 5:Dia
 	add $t4,$t4,$s1		#Dia en $t4
 
-	add $s4,$zero,$t0
-	add $s4,$s4,$t1
-	add $s4,$s4,$t2
-	add $s4,$s4,$t3
-	add $s4,$s4,$t4
-	add $s4,$s4,$t5		#Dia de la semana en $s4
+	add $t6,$zero,$t0
+	add $t6,$t6,$t1
+	add $t6,$t6,$t2
+	add $t6,$t6,$t3
+	add $t6,$t6,$t4
+	add $t6,$t6,$t5
+	add $s4,$zero,$t6	#Dia de la semana en $s4
 	
 	bge $s4,7,Resta7
 	j Paso3
